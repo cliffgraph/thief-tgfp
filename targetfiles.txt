@@ -1,0 +1,14 @@
+﻿OBJS = \
+	src/tools/constools.o \
+	src/tools/CUTimeCount.o \
+	src/tools/tools.o \
+	src/muse/RmmChipMuse.o \
+	src/udp/CUdpSocket.o \
+	src/main.o \
+	src/pch.o 
+
+INCPATH	= \
+	-Isrc \
+	-Isrc/tools \
+	-Isrc/muse \
+	-Isrc/udp
