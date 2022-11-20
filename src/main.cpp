@@ -94,18 +94,31 @@ static void mute(RmmChipMuse *pOpll, RmmChipMuse *pPsg, RmmChipMuse *pScc)
 	pOpll->SetRegister(0x36, 0x0F);
 	pOpll->SetRegister(0x37, 0xFF);
 	pOpll->SetRegister(0x38, 0xFF);
+
 	// PSG
 	pPsg->SetRegister(0x08, 0x00);
 	pPsg->SetRegister(0x09, 0x00);
 	pPsg->SetRegister(0x0A, 0x00);
-	// SCC
-	pScc->SetRegister(0x9000, 0x3f);
-	pScc->SetRegister(0x988A, 0);
-	pScc->SetRegister(0x988B, 0);
-	pScc->SetRegister(0x988C, 0);
-	pScc->SetRegister(0x988D, 0);
-	pScc->SetRegister(0x988E, 0);
 
+	// SCC+
+	pScc->SetRegister(0xbffe, 0x30);
+	pScc->SetRegister(0xb000, 0x80);
+	pScc->SetRegister(0xb8aa, 0x00);
+	pScc->SetRegister(0xb8ab, 0x00);
+	pScc->SetRegister(0xb8ac, 0x00);
+	pScc->SetRegister(0xb8ad, 0x00);
+	pScc->SetRegister(0xb8ae, 0x00);
+	pScc->SetRegister(0xb8af, 0x00);	// turn off, CH.A-E
+
+	// SCC
+	pScc->SetRegister(0xbffe, 0x00);
+	pScc->SetRegister(0x9000, 0x3f);
+	pScc->SetRegister(0x988a, 0x00);
+	pScc->SetRegister(0x988b, 0x00);
+	pScc->SetRegister(0x988c, 0x00);
+	pScc->SetRegister(0x988d, 0x00);
+	pScc->SetRegister(0x988e, 0x00);
+	pScc->SetRegister(0x98af, 0x00);	// turn off, CH.A-E
 	return;
 }
 
@@ -165,13 +178,16 @@ bool playerReceiveData(
 						plaingIndex = 0;
 						bFirst = true;
 						bPlayng = false;
-						while(!pFifo->empty()) pFifo->pop();
+						while (!pFifo->empty())
+							pFifo->pop();
 						break;
 					}
 					case TGPACKET_TG_ATOMS:			// TGFE -> TGFP, 再生データ、inde=データのインデックス
 					{
+						if (!bPlayng)
+							break;
 						auto *p = reinterpret_cast<const TGPACKET*>(pRecvBuff);
-						for( int t = 0; t < static_cast<int>(p->num); ++t){
+						for (int t = 0; t < static_cast<int>(p->num); ++t){
 							pFifo->push(p->atoms[t]);
 						}
 						bReceivedAtoms = true;
@@ -386,7 +402,7 @@ int main(int argc, char *argv[])
     sigaction(SIGINT, &act, NULL);
 
 	OPTS opts;
-	t_OC(_T("\nthief-tgfp version 1.4 by @Harumakkin, 2022\n"));
+	t_OC(_T("\nthief-tgfp version 1.5 by @Harumakkin, 2022\n"));
 	const bool bOpt = options(argc, argv, &opts);
 	if( !bOpt || opts.bHelp ){
 		printHelp();

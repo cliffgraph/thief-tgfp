@@ -20,7 +20,6 @@ public:
 	bool SetRegisterAddr(const uint32_t addr);
 	bool SetRegisterData(const uint32_t data);
 
-
 // 内部処理
 private:
 	void setPSG(const uint32_t addr, const uint32_t data);
@@ -36,4 +35,5 @@ private:
 	void initRegs(const bool bWithoutSCC = false);
 	void initClockfoHraSCC();
 	void initGpio();
+	void setupGpio();
 };
